@@ -1,6 +1,8 @@
 (ns tv.core
   (:use clojure.pprint
-        quil.core)
+        quil.core
+        ;seesaw.core
+        )
   (:import com.moviejukebox.thetvdb.TheTVDB))
 
 
@@ -64,18 +66,21 @@
 
 (let [search-string   "Nikita"
       shows           (tvdb-show-search search-string)
+      shows-with-banners (filter #(:banner-url %) shows)
       chosen-show-idx (promise)
       show-chooser    (sketch
                        :title "TV Renamer"
                        :setup (fn []
                                 (setup)
-                                (doseq [s shows]
+                                (doseq [s shows-with-banners]
                                   (deliver (:banner s) (request-image (:banner-url s)))))
                        :draw (fn []
                                         ;(draw)
-                               (rect 0 0 800 600)
-                               (let [b-height (.height @(:banner (first shows)))]
-                                 (doseq [[i s] (map vector (range) shows)]
+                               (rect 0 0 800 1600)
+
+
+                               (let [b-height (.height @(:banner (first shows-with-banners)))]
+                                 (doseq [[i s] (map vector (range) shows-with-banners)]
                                    (if (== i (int (/ (mouse-y) 200)))
                                      (tint 255 255)
                                      (tint 255 128))
